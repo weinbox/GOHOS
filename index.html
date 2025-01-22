@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عرض بيانات الأعطال</title>
+    <style>
+        /* تحسينات تصميم البطاقة */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            color: #333;
+        }
+
+        h1 {
+            text-align: center;
+            margin: 20px 0;
+            color: #333;
+        }
+
+        #cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .card {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 20px;
+            margin: 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            width: 300px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+        }
+
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .popup.open {
+            display: block;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 500;
+        }
+
+        .overlay.open {
+            display: block;
+        }
+
+        button {
+            background-color: #333;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: #555;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>أعطال الصيانة</h1>
+    <div id="cards-container">
+        <!-- سيتم ملء الأعطال هنا كعناصر -->
+    </div>
+
+    <!-- النافذة المنبثقة للتفاصيل -->
+    <div id="popup" class="popup">
+        <h2>تفاصيل العطل</h2>
+        <p><strong>تاريخ التسجيل:</strong> <span id="date"></span></p>
+        <p><strong>الأولوية:</strong> <span id="priority"></span></p>
+        <p><strong>المكان:</strong> <span id="location"></span></p>
+        <p><strong>مكان العطل الدقيق:</strong> <span id="exact-location"></span></p>
+        <p><strong>تفاصيل العطل:</strong> <span id="details"></span></p>
+        <p><strong>حالة الصيانة:</strong> <span id="status"></span></p>
+        <p><strong>الصورة:</strong> <a id="image-link" href="" target="_blank">عرض الصورة</a></p>
+        <button onclick="closePopup()">إغلاق</button>
+    </div>
+
+    <!-- Overlay -->
+    <div id="overlay" class="overlay"></div>
+
+    <script>
+        const API_KEY = 'AIzaSyAXpv8HpDK48dT8P1C6zpJNH4896kf3mL0'; // ضع هنا مفتاح API الذي حصلت عليه من Google Cloud
+        const SHEET_ID = '1bn2fbuQeDATPiOSOhORkqi1cd6g7Ct_8CG32_66h3NI'; // ضع هنا معرف الورقة من Google Sheets
+
+        // رابط لبيانات Google Sheets
+        const SHEET_URL = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}/values/Sheet1?key=${API_KEY}`;
+
+        // جلب البيانات من Google Sheets
+        fetch(SHEET_URL)
+            .then(response => response.json())
+            .then(data => {
+                const rows = data.values; // جميع الصفوف
+                const cardsContainer = document.getElementById('cards-container');
+
+                // إنشاء البطاقات
+                rows.slice(1).forEach(row => { // تجاهل الصف الأول الذي يحتوي على العناوين
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.innerHTML = `<h3>${row[4]}</h3><p>${row[1]} - ${row[2]}</p>`;
+                    card.onclick = () => showDetails(row);
+                    cardsContainer.appendChild(card);
+                });
+            })
+            .catch(error => console.error('Error:', error));
+
+        // عرض التفاصيل في نافذة منبثقة
+        function showDetails(row) {
+            document.getElementById('date').textContent = row[0]; // تاريخ التسجيل
+            document.getElementById('priority').textContent = row[1]; // الأولوية
+            document.getElementById('location').textContent = row[2]; // المكان
+            document.getElementById('exact-location').textContent = row[3]; // مكان العطل الدقيق
+            document.getElementById('details').textContent = row[4]; // تفاصيل العطل
+            document.getElementById('status').textContent = row[6]; // حالة الصيانة
+            document.getElementById('image-link').href = row[5]; // الصورة
+            popup.classList.add('open');
+            overlay.classList.add('open');
+        }
+
+        // إغلاق النافذة المنبثقة
+        function closePopup() {
+            popup.classList.remove('open');
+            overlay.classList.remove('open');
+        }
+    </script>
+
+</body>
+</html>
