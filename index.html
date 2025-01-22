@@ -35,6 +35,12 @@
             width: 300px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             transition: transform 0.2s;
+            display: flex; /* لجعل المحتوى داخل البطاقة يتم محاذاته */
+            flex-direction: column; /* ترتيب العناصر رأسياً */
+            justify-content: center; /* محاذاة عمودية */
+            align-items: center; /* محاذاة أفقية */
+            text-align: center; /* محاذاة النص أفقياً */
+            height: 200px; /* تحديد ارتفاع البطاقة لضمان المحاذاة */
         }
 
         .card:hover {
@@ -54,6 +60,7 @@
             z-index: 1000;
             max-width: 400px;
             width: 100%;
+            text-align: center; /* محاذاة النص في المنتصف */
         }
 
         .popup.open {
